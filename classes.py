@@ -15,8 +15,7 @@ class List:
 
     def __str__(self):
         self.get_elements()
-        return 'A array of objects.\n File: {} \n Size: {}\n Elements:{}'.format(self.__path, len(self.elements),
-                                                                                 self.elements)
+        return f'A array of objects.\n File: {self.__path} \n Size: {len(self.elements)}\n Elements:{self.elements}'
 
     def get_elements(self):
         try:
@@ -130,7 +129,7 @@ class OptionsButton(Button):
 
 class DeleteButton(Button):
     name = 'Delete Button'
-    font = 'Arial 20'
+    font = 'Arial 17'
     bg = '#ff8521'
     fg = '#ffffff'
     highlightcolor = '#c26417'

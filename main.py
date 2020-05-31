@@ -1,6 +1,6 @@
 import os
 import tkinter as tk
-from classes import MenuButton, OptionsButton, widgets_list, List
+from classes import MenuButton, OptionsButton, List, widgets_list
 
 file_path = 'data\\'
 
@@ -168,6 +168,7 @@ def clear():
 
 root = tk.Tk()
 root.geometry('900x500')
+root.minsize(675, 375)
 root.title('TRUTH OR DARE')
 
 if not os.path.exists(file_path):
