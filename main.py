@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
-from classes import MenuButton, OptionsButton, widgets_list, List
+from tkinter import messagebox as mb
+from classes import MenuButton, OptionsButton, InListButton, List, widgets_list
 
 file_path = 'data\\'
 
@@ -64,69 +65,103 @@ def truth_or_dare(player, list_class):
 
 def show(list_class):
     clear()
-    list_class.show()
+    lbox = list_class.show()
 
     if list_class == players:
         word = 'PLAYER'
+        string = 'name of player'
+        func = play
+        entry = tk.Entry(font='Arial 25')
+        relheight = .1
     elif list_class == questions:
         word = 'QUESTION'
+        string = 'text of question'
+        func = lambda: show(questions)
+        entry = tk.Text(font='Arial 25')
+        relheight = .3
     elif list_class == tasks:
         word = 'TASK'
+        string = 'text of task'
+        func = lambda: show(tasks)
+        entry = tk.Text(font='Arial 25')
+        relheight = .3
     else:
-        word = None
+        word = string = func = entry = relheight = None
+
+    def add(replace=False):
+        element = ''
+        if replace:
+            select = lbox.curselection()
+
+            if select != ():
+                index = lbox.index(select)
+                element = list_class.elements[index]
+            else:
+                replace = False
+
+        clear()
+
+        label = tk.Label(text=f'Enter the {string}:', font='Arial 30')
+        widgets_list.append(label)
+        label.place(relx=.1, rely=.1, relwidth=.8)
+
+        widgets_list.append(entry)
+        entry.place(relx=.2, rely=.25, relwidth=.6, relheight=relheight)
+        if list_class == players:
+            entry_index = 0
+        else:
+            entry_index = 1.0
+        entry.insert(entry_index, element)
+
+        def confirm():
+            if replace:
+                if list_class == players:
+                    players.replace_element(index, entry.get())
+                else:
+                    list_class.replace_element(index, entry.get(1.0, tk.END))
+                func()
+            else:
+                if list_class == players:
+                    players.add_element(entry.get())
+                else:
+                    list_class.add_element(entry.get(1.0, tk.END))
+                func()
+
+        cancel_btn = OptionsButton('CANCEL', func)
+        cancel_btn.place_button()
+
+        confirm_btn = OptionsButton('CONFIRM', confirm)
+        confirm_btn.relx = .6
+        confirm_btn.place_button()
+
+    def delete():
+
+        select = lbox.curselection()
+
+        if select != ():
+            index = lbox.index(select)
+            element = list_class.elements[index]
+            answer = mb.askyesno(title=f'DELETE {word}', message=f'DO YOU WANT TO DELETE {word}:\n{element}')
+            if answer:
+                list_class.remove_element(index)
+                lbox.delete(select)
 
     main_menu_btn = OptionsButton('MAIN MENU', main_menu)
     main_menu_btn.relx = .05
     main_menu_btn.relwidth = .25
     main_menu_btn.place_button()
 
-    add_btn = OptionsButton(f'ADD NEW\n{word}', lambda: add(list_class))
+    add_btn = OptionsButton(f'ADD NEW\n{word}', add)
     add_btn.relx = .7
     add_btn.relwidth = .25
     add_btn.place_button()
 
+    edit_btn = InListButton('EDIT', lambda: add(True))
+    edit_btn.place_button()
 
-def add(list_class):
-    clear()
-
-    if list_class == players:
-        string = 'name of player'
-        func = play
-        entry = tk.Entry(font='Arial 25')
-        relheight = .1
-    elif list_class == questions:
-        string = 'text of question'
-        func = lambda: show(questions)
-        entry = tk.Text(font='Arial 25')
-        relheight = .3
-    elif list_class == tasks:
-        string = 'text of task'
-        func = lambda: show(tasks)
-        entry = tk.Text(font='Arial 25')
-        relheight = .3
-    else:
-        string = func = entry = relheight = None
-
-    label = tk.Label(text=f'Enter the {string}:', font='Arial 30')
-    widgets_list.append(label)
-    label.place(relx=.1, rely=.1, relwidth=.8)
-
-    widgets_list.append(entry)
-    entry.place(relx=.2, rely=.25, relwidth=.6, relheight=relheight)
-
-    def confirm():
-        if list_class == players:
-            players.add_element(entry.get())
-        else:
-            list_class.add_element(entry.get(1.0, tk.END))
-        func()
-
-    cancel_btn = OptionsButton('CANCEL', func)
-    cancel_btn.place_button()
-
-    confirm_btn = OptionsButton('CONFIRM', confirm)
-    confirm_btn.relx = .6
-    confirm_btn.place_button()
+    del_btn = InListButton('DELETE', delete)
+    del_btn.rely = .2
+    del_btn.place_button()
 
 
 def settings():
@@ -168,6 +203,7 @@ def clear():
 
 root = tk.Tk()
 root.geometry('900x500')
+root.minsize(675, 375)
 root.title('TRUTH OR DARE')
 
 if not os.path.exists(file_path):

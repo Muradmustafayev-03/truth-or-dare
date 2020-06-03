@@ -15,8 +15,7 @@ class List:
 
     def __str__(self):
         self.get_elements()
-        return 'A array of objects.\n File: {} \n Size: {}\n Elements:{}'.format(self.__path, len(self.elements),
-                                                                                 self.elements)
+        return f'A array of objects.\n File: {self.__path} \n Size: {len(self.elements)}\n Elements:{self.elements}'
 
     def get_elements(self):
         try:
@@ -47,6 +46,10 @@ class List:
         self.elements.pop(index)
         self.save()
 
+    def replace_element(self, index, new):
+        self.elements[index] = new
+        self.save()
+
     def show(self):
         lbox = tk.Listbox()
         widgets_list.append(lbox)
@@ -60,15 +63,7 @@ class List:
         for element in self.elements:
             lbox.insert(tk.END, element)
 
-        def delete():
-            select = lbox.curselection()
-
-            if select != ():
-                self.remove_element(lbox.index(select))
-                lbox.delete(select)
-
-        del_btn = DeleteButton('DELETE', delete)
-        del_btn.place_button()
+        return lbox
 
 
 class Button:
@@ -128,9 +123,9 @@ class OptionsButton(Button):
     relheight = .2
 
 
-class DeleteButton(Button):
+class InListButton(Button):
     name = 'Delete Button'
-    font = 'Arial 20'
+    font = 'Arial 17'
     bg = '#ff8521'
     fg = '#ffffff'
     highlightcolor = '#c26417'
