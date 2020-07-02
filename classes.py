@@ -1,11 +1,22 @@
 import random
 import tkinter as tk
 
-widgets_list = []
+widgets = []
+strings = []
 
 
-def do_nothing():
-    pass
+class String:
+    def __init__(self, eng, rus):
+        strings.append(self)
+        self.eng = eng
+        self.rus = rus
+        self.text = ''
+
+    def set_lang(self, lang):
+        if lang == 'eng':
+            self.text = self.eng
+        elif lang == 'rus':
+            self.text = self.rus
 
 
 class List:
@@ -15,8 +26,7 @@ class List:
 
     def __str__(self):
         self.get_elements()
-        return 'A array of objects.\n File: {} \n Size: {}\n Elements:{}'.format(self.__path, len(self.elements),
-                                                                                 self.elements)
+        return f'A array of objects.\n File: {self.__path} \n Size: {len(self.elements)}\n Elements:{self.elements}'
 
     def get_elements(self):
         try:
@@ -47,28 +57,24 @@ class List:
         self.elements.pop(index)
         self.save()
 
+    def replace_element(self, index, new):
+        self.elements[index] = new
+        self.save()
+
     def show(self):
         lbox = tk.Listbox()
-        widgets_list.append(lbox)
+        widgets.append(lbox)
         lbox.place(relx=.2, rely=.1, relwidth=.75, relheight=.55)
 
         scroll = tk.Scrollbar(command=lbox.yview)
-        widgets_list.append(scroll)
+        widgets.append(scroll)
         scroll.place(relx=.18, rely=.1, relwidth=.02, relheight=.55)
         lbox.config(yscrollcommand=scroll.set)
 
         for element in self.elements:
             lbox.insert(tk.END, element)
 
-        def delete():
-            select = lbox.curselection()
-
-            if select != ():
-                self.remove_element(lbox.index(select))
-                lbox.delete(select)
-
-        del_btn = DeleteButton('DELETE', delete)
-        del_btn.place_button()
+        return lbox
 
 
 class Button:
@@ -84,7 +90,7 @@ class Button:
     relwidth = .5
     relheight = .125
 
-    def __init__(self, text, command=do_nothing):
+    def __init__(self, text, command):
         self.__text = text
         self.__command = command
         self.__button = tk.Button(text=self.__text, font=self.font, justify=self.justify,
@@ -96,7 +102,7 @@ class Button:
 
     def place_button(self):
         self.__button.place(relx=self.relx, rely=self.rely, relwidth=self.relwidth, relheight=self.relheight)
-        widgets_list.append(self)
+        widgets.append(self)
 
     def destroy(self):
         self.__button.place_forget()
@@ -128,9 +134,9 @@ class OptionsButton(Button):
     relheight = .2
 
 
-class DeleteButton(Button):
+class InListButton(Button):
     name = 'Delete Button'
-    font = 'Arial 20'
+    font = 'Arial 17'
     bg = '#ff8521'
     fg = '#ffffff'
     highlightcolor = '#c26417'
