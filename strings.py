@@ -16,6 +16,7 @@ lang = String('LANGUAGE', 'ЯЗЫК')
 rules = String('RULES', 'ПРАВИЛА')
 questions = String('QUESTIONS', 'ВОПРОСЫ')
 tasks = String('TASKS', 'ЗАДАНИЯ')
+back = String('BACK', 'НАЗАД')
 
 player = String('PLAYER', 'ИГРОКА')
 question = String('QUESTION', 'ВОПРОС')

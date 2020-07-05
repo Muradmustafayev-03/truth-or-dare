@@ -26,7 +26,7 @@ class List:
 
     def __str__(self):
         self.get_elements()
-        return f'A array of objects.\n File: {self.__path} \n Size: {len(self.elements)}\n Elements:{self.elements}'
+        return f'A list of objects.\n File: {self.__path} \n Size: {len(self.elements)}\n Elements:{self.elements}'
 
     def get_elements(self):
         try:
