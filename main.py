@@ -217,7 +217,7 @@ def lang():
     eng_btn = MenuButton('ENGLISH', lambda: set_lang('eng'))
     eng_btn.place_button()
 
-    rus_btn = MenuButton('Русский', lambda: set_lang('rus'))
+    rus_btn = MenuButton('РУССКИЙ', lambda: set_lang('rus'))
     rus_btn.rely = .4
     rus_btn.place_button()
 
