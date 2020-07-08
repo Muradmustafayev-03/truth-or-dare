@@ -4,9 +4,19 @@ from tkinter import messagebox as mb
 import strings as st
 from classes import MenuButton, OptionsButton, InListButton, List, widgets, strings
 
-
 root = tk.Tk()
 file_path = 'data\\'
+
+if not os.path.exists(file_path):
+    os.mkdir(file_path)
+
+players = List(file_path + 'players.txt')
+questions = List(file_path + 'questions.txt')
+tasks = List(file_path + 'tasks.txt')
+
+players.get_elements()
+questions.get_elements()
+tasks.get_elements()
 
 
 def main_menu():
@@ -24,8 +34,8 @@ def main_menu():
     exit_btn.place_button()
 
 
-def play():
-    show(players)
+def play(list_class=players):
+    show(list_class)
 
     start_btn = OptionsButton(st.start.text, start)
     start_btn.relx = .35
@@ -70,26 +80,22 @@ def show(list_class):
     clear()
     lbox = list_class.show()
 
+    func = play if list_class == players else show
+    entry = tk.Entry(font='Arial 25') if list_class == players else tk.Text(font='Arial 25')
+    relheight = .1 if list_class == players else .3
+    word = string = ''
+
     if list_class == players:
         word = st.player
         string = st.enter_player.text
-        func = play
-        entry = tk.Entry(font='Arial 25')
-        relheight = .1
-    elif list_class == questions:
+
+    if list_class == questions:
         word = st.question
         string = st.enter_question.text
-        func = lambda: show(questions)
-        entry = tk.Text(font='Arial 25')
-        relheight = .3
-    elif list_class == tasks:
+
+    if list_class == tasks:
         word = st.task
         string = st.enter_task.text
-        func = lambda: show(tasks)
-        entry = tk.Text(font='Arial 25')
-        relheight = .3
-    else:
-        word = string = func = entry = relheight = None
 
     def add(replace=False):
         element = ''
@@ -122,15 +128,15 @@ def show(list_class):
                     players.replace_element(index, entry.get())
                 else:
                     list_class.replace_element(index, entry.get(1.0, tk.END))
-                func()
+                func(list_class)
             else:
                 if list_class == players:
                     players.add_element(entry.get())
                 else:
                     list_class.add_element(entry.get(1.0, tk.END))
-                func()
+                func(list_class)
 
-        cancel_btn = OptionsButton(st.cancel.text, func)
+        cancel_btn = OptionsButton(st.cancel.text, lambda: func(list_class))
         cancel_btn.place_button()
 
         confirm_btn = OptionsButton(st.confirm.text, confirm)
@@ -150,10 +156,10 @@ def show(list_class):
                 list_class.remove_element(index)
                 lbox.delete(select)
 
-    menu_btn = OptionsButton(st.main_menu.text, main_menu)
-    menu_btn.relx = .05
-    menu_btn.relwidth = .25
-    menu_btn.place_button()
+    back_btn = OptionsButton(st.back.text, settings)
+    back_btn.relx = .05
+    back_btn.relwidth = .25
+    back_btn.place_button()
 
     add_btn = OptionsButton(f'{st.add.text}\n{word.text}', add)
     add_btn.relx = .7
@@ -211,13 +217,13 @@ def lang():
     eng_btn = MenuButton('ENGLISH', lambda: set_lang('eng'))
     eng_btn.place_button()
 
-    rus_btn = MenuButton('Русский', lambda: set_lang('rus'))
+    rus_btn = MenuButton('РУССКИЙ', lambda: set_lang('rus'))
     rus_btn.rely = .4
     rus_btn.place_button()
 
-    menu_btn = MenuButton(st.main_menu.text, main_menu)
-    menu_btn.rely = .7
-    menu_btn.place_button()
+    back_btn = MenuButton(st.back.text, settings)
+    back_btn.rely = .7
+    back_btn.place_button()
 
 
 def set_lang(language):
@@ -235,17 +241,6 @@ def rules():
 
 root.geometry('900x500')
 root.minsize(675, 375)
-
-if not os.path.exists(file_path):
-    os.mkdir(file_path)
-
-players = List(file_path + 'players.txt')
-questions = List(file_path + 'questions.txt')
-tasks = List(file_path + 'tasks.txt')
-
-players.get_elements()
-questions.get_elements()
-tasks.get_elements()
 
 set_lang('eng')
 main_menu()
