@@ -1,4 +1,3 @@
-import random
 import tkinter as tk
 
 widgets = []
@@ -17,64 +16,6 @@ class String:
             self.text = self.eng
         elif lang == 'rus':
             self.text = self.rus
-
-
-class List:
-    def __init__(self, path):
-        self.__path = path
-        self.elements = []
-
-    def __str__(self):
-        self.get_elements()
-        return f'A list of objects.\n File: {self.__path} \n Size: {len(self.elements)}\n Elements:{self.elements}'
-
-    def get_elements(self):
-        try:
-            with open(self.__path, 'r') as file:
-                self.elements = file.read().strip().split('\n')
-                if not self.elements[-1]:
-                    self.elements.pop()
-        except FileNotFoundError:
-            self.elements = []
-
-    def save(self):
-        with open(self.__path, 'w') as file:
-            for element in self.elements:
-                file.write(element + '\n')
-
-    def choose_random(self):
-        try:
-            randomized = random.choice(self.elements)
-            return randomized
-        except IndexError:
-            pass
-
-    def add_element(self, element):
-        self.elements.append(element)
-        self.save()
-
-    def remove_element(self, index):
-        self.elements.pop(index)
-        self.save()
-
-    def replace_element(self, index, new):
-        self.elements[index] = new
-        self.save()
-
-    def show(self):
-        lbox = tk.Listbox()
-        widgets.append(lbox)
-        lbox.place(relx=.2, rely=.1, relwidth=.75, relheight=.55)
-
-        scroll = tk.Scrollbar(command=lbox.yview)
-        widgets.append(scroll)
-        scroll.place(relx=.18, rely=.1, relwidth=.02, relheight=.55)
-        lbox.config(yscrollcommand=scroll.set)
-
-        for element in self.elements:
-            lbox.insert(tk.END, element)
-
-        return lbox
 
 
 class Button:
@@ -130,7 +71,7 @@ class OptionsButton(Button):
     activebackground = '#e66700'
     relx = .1
     rely = .7
-    relwidth = .3
+    relwidth = .25
     relheight = .2
 
 

@@ -1,22 +1,83 @@
 import os
+import random
 import tkinter as tk
-from tkinter import messagebox as mb
+# from tkinter import messagebox as mb
 import strings as st
-from classes import MenuButton, OptionsButton, InListButton, List, widgets, strings
+from classes import MenuButton, OptionsButton, widgets, strings
 
 root = tk.Tk()
-file_path = 'data\\'
 
-if not os.path.exists(file_path):
-    os.mkdir(file_path)
+if not os.path.exists('data\\'):
+    os.mkdir('data\\')
 
-players = List(file_path + 'players.txt')
-questions = List(file_path + 'questions.txt')
-tasks = List(file_path + 'tasks.txt')
 
-players.get_elements()
-questions.get_elements()
-tasks.get_elements()
+def get_list_from_file(file_path):
+    with open(file_path, 'r') as file:
+        try:
+            lis = file.read().strip().split('\n')
+            if len(lis) > 1:
+                if not lis[-1]:
+                    players.pop()
+        except FileNotFoundError():
+            lis = []
+
+    return lis
+
+
+def save():
+    for file_path in ['data\\questions.txt', 'data\\tasks.txt', 'data\\players.txt']:
+        for lis in [questions, tasks, players]:
+            with open(file_path, 'w') as file:
+                for element in lis:
+                    file.write(element + '\n')
+
+
+def choose_random(lis):
+    try:
+        randomized = random.choice(lis)
+        return randomized
+    except IndexError:
+        pass
+
+
+def show(lis):
+    clear()
+    lbox = tk.Listbox()
+    widgets.append(lbox)
+    lbox.place(relx=.2, rely=.1, relwidth=.75, relheight=.55)
+
+    scroll = tk.Scrollbar(command=lbox.yview)
+    widgets.append(scroll)
+    scroll.place(relx=.18, rely=.1, relwidth=.02, relheight=.55)
+    lbox.config(yscrollcommand=scroll.set)
+
+    for element in lis:
+        lbox.insert(tk.END, element)
+
+    obj = ''
+    if lis == players:
+        obj = st.player.text
+    if lis == questions:
+        obj = st.question.text
+    if lis == tasks:
+        obj = st.task.text
+
+    add_btn = OptionsButton(st.add.text + '\n' + obj, lambda: add(lis))
+    add_btn.relx = .7
+    add_btn.place_button()
+
+    menu_btn = OptionsButton(st.main_menu.text, main_menu)
+    menu_btn.relx = .05
+    menu_btn.place_button()
+
+
+def add(lis):
+    main_menu()
+
+
+questions = get_list_from_file('data\\questions.txt')
+tasks = get_list_from_file('data\\tasks.txt')
+players = get_list_from_file('data\\players.txt')
 
 
 def main_menu():
@@ -34,18 +95,18 @@ def main_menu():
     exit_btn.place_button()
 
 
-def play(list_class=players):
-    show(list_class)
+def play():
+    show(players)
 
     start_btn = OptionsButton(st.start.text, start)
-    start_btn.relx = .35
+    start_btn.relx = .375
     start_btn.place_button()
 
 
 def start():
     clear()
 
-    player = players.choose_random()
+    player = choose_random(players)
     label = tk.Label(text=f'{player}, {st.truth_dare.text}', font='Arial 30')
     widgets.append(label)
     label.place(relx=.1, rely=.1, relwidth=.8)
@@ -58,11 +119,11 @@ def start():
     dare_btn.place_button()
 
 
-def truth_or_dare(player, list_class):
+def truth_or_dare(player, lis):
     clear()
 
-    random = list_class.choose_random()
-    text = f'{player}, {random}'
+    choice = choose_random(lis)
+    text = f'{player}, {choice}'
     text = f'{text[0:35]}\n{text[35:70]}\n{text[70:105]}\n{text[105:140]}\n{text[140:175]}\n{text[175:210]}'
     label = tk.Label(text=text, font='Arial 30')
     widgets.append(label)
@@ -74,104 +135,6 @@ def truth_or_dare(player, list_class):
     continue_btn = OptionsButton(st.continue_.text, start)
     continue_btn.relx = .6
     continue_btn.place_button()
-
-
-def show(list_class):
-    clear()
-    lbox = list_class.show()
-
-    func = play if list_class == players else show
-    entry = tk.Entry(font='Arial 25') if list_class == players else tk.Text(font='Arial 25')
-    relheight = .1 if list_class == players else .3
-    word = string = ''
-
-    if list_class == players:
-        word = st.player
-        string = st.enter_player.text
-
-    if list_class == questions:
-        word = st.question
-        string = st.enter_question.text
-
-    if list_class == tasks:
-        word = st.task
-        string = st.enter_task.text
-
-    def add(replace=False):
-        element = ''
-        if replace:
-            select = lbox.curselection()
-
-            if select != ():
-                index = lbox.index(select)
-                element = list_class.elements[index]
-            else:
-                replace = False
-
-        clear()
-
-        label = tk.Label(text=string, font='Arial 30')
-        widgets.append(label)
-        label.place(relx=.1, rely=.1, relwidth=.8)
-
-        widgets.append(entry)
-        entry.place(relx=.2, rely=.25, relwidth=.6, relheight=relheight)
-        if list_class == players:
-            entry_index = 0
-        else:
-            entry_index = 1.0
-        entry.insert(entry_index, element)
-
-        def confirm():
-            if replace:
-                if list_class == players:
-                    players.replace_element(index, entry.get())
-                else:
-                    list_class.replace_element(index, entry.get(1.0, tk.END))
-                func(list_class)
-            else:
-                if list_class == players:
-                    players.add_element(entry.get())
-                else:
-                    list_class.add_element(entry.get(1.0, tk.END))
-                func(list_class)
-
-        cancel_btn = OptionsButton(st.cancel.text, lambda: func(list_class))
-        cancel_btn.place_button()
-
-        confirm_btn = OptionsButton(st.confirm.text, confirm)
-        confirm_btn.relx = .6
-        confirm_btn.place_button()
-
-    def delete():
-
-        select = lbox.curselection()
-
-        if select != ():
-            index = lbox.index(select)
-            element = list_class.elements[index]
-            answer = mb.askyesno(title=f'{st.delete.text} {word.text}', message=f'{st.del_confirm.text}\n{word.text}: '
-                                                                                f'{element}?')
-            if answer:
-                list_class.remove_element(index)
-                lbox.delete(select)
-
-    back_btn = OptionsButton(st.back.text, settings)
-    back_btn.relx = .05
-    back_btn.relwidth = .25
-    back_btn.place_button()
-
-    add_btn = OptionsButton(f'{st.add.text}\n{word.text}', add)
-    add_btn.relx = .7
-    add_btn.relwidth = .25
-    add_btn.place_button()
-
-    edit_btn = InListButton(st.edit.text, lambda: add(True))
-    edit_btn.place_button()
-
-    del_btn = InListButton(st.delete.text, delete)
-    del_btn.rely = .2
-    del_btn.place_button()
 
 
 def settings():
